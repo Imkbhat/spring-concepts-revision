@@ -1,0 +1,62 @@
+
+@Autowired
+private TestDAO testDAO;
+
+@Transactional(propagation=TransactionDefinition.PROPAGATION_REQUIRED,isolation=TransactionDefinition.ISOLATION_READ_UNCOMMITTED)
+public void someTransactionalMethod(User user) {
+
+  // Interact with testDAO
+
+}
+
+Propagation (Reproduction) : is uses for inter transaction relation. (analogous to java inter thread communication)
+
++-------+---------------------------+------------------------------------------------------------------------------------------------------+
+| value |        Propagation        |                                             Description                                              |
++-------+---------------------------+------------------------------------------------------------------------------------------------------+
+|    -1 | TIMEOUT_DEFAULT           | Use the default timeout of the underlying transaction system, or none if timeouts are not supported. |
+|     0 | PROPAGATION_REQUIRED      | Support a current transaction; create a new one if none exists.                                      |
+|     1 | PROPAGATION_SUPPORTS      | Support a current transaction; execute non-transactionally if none exists.                           |
+|     2 | PROPAGATION_MANDATORY     | Support a current transaction; throw an exception if no current transaction exists.                  |
+|     3 | PROPAGATION_REQUIRES_NEW  | Create a new transaction, suspending the current transaction if one exists.                          |
+|     4 | PROPAGATION_NOT_SUPPORTED | Do not support a current transaction; rather always execute non-transactionally.                     |
+|     5 | PROPAGATION_NEVER         | Do not support a current transaction; throw an exception if a current transaction exists.            |
+|     6 | PROPAGATION_NESTED        | Execute within a nested transaction if a current transaction exists.                                 |
++-------+---------------------------+------------------------------------------------------------------------------------------------------+
+
+Isolation : Isolation is one of the ACID (Atomicity, Consistency, Isolation, Durability) properties of database transactions. 
+Isolation determines how transaction integrity is visible to other users and systems. It uses for resource locking 
+i.e. concurrency control, make sure that only one transaction can access the resource at a given point.
+
+Locking perception: isolation level determines the duration that locks are held.
+
++---------------------------+-------------------+-------------+-------------+------------------------+
+| Isolation Level Mode      |  Read             |   Insert    |   Update    |       Lock Scope       |
++---------------------------+-------------------+-------------+-------------+------------------------+
+| READ_UNCOMMITTED          |  uncommitted data | Allowed     | Allowed     | No Lock                |
+| READ_COMMITTED (Default)  |   committed data  | Allowed     | Allowed     | Lock on Committed data |
+| REPEATABLE_READ           |   committed data  | Allowed     | Not Allowed | Lock on block of table |
+| SERIALIZABLE              |   committed data  | Not Allowed | Not Allowed | Lock on full table     |
++---------------------------+-------------------+-------------+-------------+------------------------+
+
+Read perception: the following 3 kinds of major problems occurs:
+
+Dirty reads : reads uncommitted data from another tx(transaction).
+Non-repeatable reads : reads committed UPDATES from another tx.
+Phantom reads : reads committed INSERTS and/or DELETES from another tx
+
+Isolation levels with different kinds of reads:
+
++---------------------------+----------------+----------------------+----------------+
+| Isolation Level Mode      |  Dirty reads   | Non-repeatable reads | Phantoms reads |
++---------------------------+----------------+----------------------+----------------+
+| READ_UNCOMMITTED          | allows         | allows               | allows         |
+| READ_COMMITTED (Default)  | prevents       | allows               | allows         |
+| REPEATABLE_READ           | prevents       | prevents             | allows         |
+| SERIALIZABLE              | prevents       | prevents             | prevents       |
++---------------------------+----------------+----------------------+----------------+
+
+Reference : https://www.byteslounge.com/tutorials/spring-transaction-isolation-tutorial
+
+
+
